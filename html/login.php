@@ -2,11 +2,12 @@
 include("db.php");
 session_start();
 
+$mensaje = "";
+
 if (isset($_SESSION["usuario"])) {
     header("Location: dashboard.php");
     exit();
 }
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
@@ -19,17 +20,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario = $result->fetch_assoc();
         if (password_verify($password, $usuario["password"])) {
             $_SESSION["usuario"] = $usuario["nombre"];
+            $_SESSION["rol"] = $usuario["rol"];
             header("Location: dashboard.php");
             exit();
-
         } else {
-            echo " Contraseña incorrecta.";
+            $mensaje = " Contraseña incorrecta.";
         }
     } else {
-        echo " Usuario no encontrado.";
+        $mensaje = " Usuario no encontrado.";
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -40,6 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container">
         <h2>Iniciar Sesión</h2>
+        <?php if (!empty($mensaje)): ?>
+        <p style="color: red; text-align: center; font-weight: bold;"><?= $mensaje ?></p>
+        <?php endif; ?>
         <form method="POST">
             <label>Email:</label>
             <input type="email" name="email" required>
